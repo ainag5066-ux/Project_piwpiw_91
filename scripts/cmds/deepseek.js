@@ -44,7 +44,7 @@ module.exports = {
     } catch (error) {
       console.error("DeepSeek command error:", error.response?.data || error.message);
       api.sendMessage(
-        "🥹error, contact MahMUD.",
+        "🥹error, contact Gojo Orupe Piw Piw.",
         event.threadID,
         event.messageID
       );
