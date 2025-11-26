@@ -29,7 +29,7 @@ module.exports = {
 
       const { male, female } = response.data;
       if (!male || !female)
-        return message.reply("Couldn't fetch couple DP. Try again later.");
+        return message.reply("Piw Piw Chat Bot Couldn't fetch couple DP. Try again later.");
 
       const attachments = [
         await global.utils.getStreamFromURL(male),
@@ -37,13 +37,13 @@ module.exports = {
       ];
 
       await message.reply({
-        body: "Here is your cdp <😘",
+        body: "Piw Piw Chat Bot Here is your cdp <😘",
         attachment: attachments
       });
 
     } catch (error) {
       console.error(error);
-      message.reply("Error fetching couple DP. Please try again later.");
+      message.reply("Piw Piw Chat Bot Error fetching couple DP. Please try again later.");
     }
   }
 };
