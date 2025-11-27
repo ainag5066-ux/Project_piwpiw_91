@@ -66,7 +66,7 @@ module.exports = {
       const res = await axios.get(apiUrl, { responseType: "arraybuffer", timeout: 20000 });
       await fs.writeFile(outPath, Buffer.from(res.data));
 
-      const bodyText = `✅ 𝙎𝙪𝙘𝙘𝙚𝙨𝙨𝙛𝙪𝙡𝙡𝙮 𝙃𝙖𝙘𝙠𝙚𝙙 𝙏𝙝𝙞𝙨 𝙐𝙨𝙚𝙧: ${displayName}`;
+      const bodyText = `✅ 𝗣𝗶𝘄 𝗣𝗶𝘄 𝗖𝗵𝗮𝘁 𝗕𝗼𝘁 𝙎𝙪𝙘𝙘𝙚𝙨𝙨𝙛𝙪𝙡𝙡𝙮 𝙃𝙖𝙘𝙠𝙚𝙙 𝙏𝙝𝙞𝙨 𝙐𝙨𝙚𝙧: ${displayName}`;
       api.sendMessage(
         { body: bodyText, attachment: fs.createReadStream(outPath) },
         event.threadID,
