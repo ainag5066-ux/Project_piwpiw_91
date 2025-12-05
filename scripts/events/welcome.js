@@ -6,7 +6,7 @@ module.exports = {
 	config: {
 		name: "welcome",
 		version: "1.7",
-		author: "NTKhang",
+		author: "NTKhang & ♡︎ 𝗦𝗵𝗔𝗻 ♡︎",
 		category: "events"
 	},
 
@@ -19,17 +19,41 @@ module.exports = {
 			welcomeMessage: "Cảm ơn bạn đã mời tôi vào nhóm!\nPrefix bot: %1\nĐể xem danh sách lệnh hãy nhập: %1help",
 			multiple1: "bạn",
 			multiple2: "các bạn",
-			defaultWelcomeMessage: "Xin chào {userName}.\nChào mừng bạn đến với {boxName}.\nChúc bạn có buổi {session} vui vẻ!"
+			defaultWelcomeMessage: `🥰 𝐀𝐬𝐬𝐚𝐥𝐚𝐦𝐮𝐥𝐚𝐢𝐤𝐮𝐦 🥰
+
+>🎀 {userName}
+
+𝐖𝐞𝐥𝐜𝐨𝐦𝐞 {multiple} 𝐭𝐨 𝐨𝐮𝐫 
+[ {boxName} ]
+𝐆𝐫𝐨𝐮𝐩
+
+𝐇𝐚𝐯𝐞 𝐚 𝐧𝐢𝐜𝐞 {session} 😊
+⚠ 𝐅𝐨𝐥𝐥𝐨𝐰 𝐚𝐥𝐥 𝐫𝐮𝐥𝐞𝐬♻
+
+╭‣ 𝐒𝐇 𝐀𝐍 ⓕ 
+╰‣m.me/Sh4n.Dev1` 
 		},
 		en: {
 			session1: "morning",
 			session2: "noon",
 			session3: "afternoon",
 			session4: "evening",
-			welcomeMessage: "𝐀𝐬𝐬𝐚𝐥𝐚𝐦𝐮𝐥𝐚𝐢𝐤𝐮𝐦 𝐈 𝐚𝐦 𝐏𝐢𝐰 𝐏𝐢𝐰 𝐂𝐡𝐚𝐭 𝐁𝐨𝐭, 𝐓𝐡𝐚𝐧𝐤 𝐘𝐨𝐮 𝐅𝐨𝐫 𝐈𝐧𝐯𝐢𝐭𝐢𝐧𝐠 𝐌𝐞 𝐓𝐨 𝐓𝐡𝐞 𝐆𝐫𝐨𝐮𝐩!\nBot prefix: %1\nTo view the list of commands, please enter: %1help",
+			welcomeMessage: "Thank you for inviting me to the group!\nBot prefix: %1\nTo view the list of commands, please enter: %1help",
 			multiple1: "you",
 			multiple2: "you guys",
-			defaultWelcomeMessage: `Hello {userName}.\nWelcome {multiple} to the chat group: {boxName}\nHave a nice {session} 😊`
+		  defaultWelcomeMessage: `🥰 𝐀𝐬𝐬𝐚𝐥𝐚𝐦𝐮𝐥𝐚𝐢𝐤𝐮𝐦 🥰
+
+>🎀 {userName}
+
+𝐖𝐞𝐥𝐜𝐨𝐦𝐞 {multiple} 𝐭𝐨 𝐨𝐮𝐫 
+[ {boxName} ]
+𝐆𝐫𝐨𝐮𝐩
+
+𝐇𝐚𝐯𝐞 𝐚 𝐧𝐢𝐜𝐞 {session} 😊
+⚠ 𝐅𝐨𝐥𝐥𝐨𝐰 𝐚𝐥𝐥 𝐫𝐮𝐥𝐞𝐬♻
+
+╭‣ 𝐒𝐇 𝐀𝐍 ⓕ 
+╰‣m.me/Sh4n.Dev1` 
 		}
 	},
 
