@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const mahmud = [
-  "baby",
+  "নানা ভাই",
   "bby",
   "babu",
   "bbu",
@@ -12,8 +12,8 @@ const mahmud = [
   "বেবি",
   "wifey",
   "hinata",
-  "gojo",
-  "piw piw",
+  "হাসান",
+  "hasan",
   "gojo orupe piw piw",
   "piw piw chat bot"
 ];
