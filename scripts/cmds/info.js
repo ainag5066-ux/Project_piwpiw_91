@@ -40,7 +40,7 @@ module.exports = {
     const address = "𝐒𝐲𝐥𝐡𝐞𝐭 , 𝗕𝗔𝗡𝗚𝗟𝗔𝗗𝗘𝗦𝗛";
     const userClass = "𝗦𝗘𝗖𝗥𝗘𝗧";
     const facebook = "https://www.facebook.com/profile.php?id=61584451283974";
-    const tiktok = "𝐃𝐢𝐭𝐚𝐦 𝐧𝐚.";
+    const tiktok = "𝐃𝐢𝐭𝐚𝐦 𝐧𝐚😾.";
 
     const now = moment().tz('Asia/Dhaka');
     const localTime = now.format('hh:mm:ss A');
