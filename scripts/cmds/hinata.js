@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const mahmud = [
-  "Xinia",
+  "xinea",
   "bby",
   "babu",
   "bbu",
