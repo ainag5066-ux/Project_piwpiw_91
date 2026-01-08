@@ -2,7 +2,7 @@
 module.exports = {
     config: {
         name: "welcome",
-        version: "8.0",
+        version: "11.0",
         author: "Ratul",
         category: "events"
     },
@@ -20,47 +20,48 @@ module.exports = {
 
             // Thread info
             const threadData = await threadsData.get(threadID);
-            const threadName = threadData.threadName || "this group";
+            const threadNameRaw = threadData.threadName || "This Group";
+            const threadName = `🌸✨ ${threadNameRaw.toUpperCase()} ✨🌸`;
+
+            // Members info
             const membersList = threadData.data?.members || [];
 
             // Mentions & names
             const mentions = addedParticipants.map(u => ({ tag: u.fullName, id: u.userFbId }));
             const userNames = addedParticipants.map(u => u.fullName).join(", ");
 
-            // Calculate member numbers
+            // Member numbers
             const memberNumbers = addedParticipants.map(u => {
                 const index = membersList.findIndex(m => m.id === u.userFbId);
-                return index >= 0 ? index + 1 : membersList.length;
+                return index >= 0 ? index + 1 : membersList.length + 1;
             });
-            const memberNumbersText = memberNumbers.join(", ");
+            const memberNumbersText = memberNumbers.map(num => `#${num}`).join(", ");
 
-            // Time-based session
+            // Time session
             const now = new Date();
             const hours = now.getHours();
             let session;
-            if (hours >= 5 && hours <= 10) session = "morning";
-            else if (hours <= 12) session = "noon";
-            else if (hours <= 18) session = "afternoon";
-            else session = "evening";
+            if (hours >= 5 && hours <= 10) session = "Morning";
+            else if (hours <= 12) session = "Noon";
+            else if (hours <= 18) session = "Afternoon";
+            else session = "Evening";
 
-            // Stylish welcome message
+            // Stylish Welcome Message with Assalamualaikum
             const welcomeMessage = `
 ╔═══════════════❁🌸❁═══════════════╗
-        🌟 Assalamualaikum 🌟
+         🌟 𝐀𝐬𝐬𝐚𝐥𝐚𝐦𝐮𝐚𝐥𝐚𝐢𝐤𝐮𝐦 🌟
 ╚═══════════════❁🌸❁═══════════════╝
 
-✨💖  WELCOME TO OUR GROUP 💖✨
+🎉 𝗡𝗘𝗪 𝗠𝗘𝗠𝗕𝗘𝗥: ${userNames}
+🎀 𝗚𝗥𝗢𝗨𝗣 𝗡𝗔𝗠𝗘: ${threadName}
+💫 𝗠𝗘𝗠𝗕𝗘𝗥 𝗡𝗨𝗠𝗕𝗘𝗥: ${memberNumbersText}
 
-❥ NEW MEMBER: ${userNames}
-🎀 Group Name: ${threadName}
-🎉 Member Number: ${memberNumbersText}
+🌸 Enjoy your time, make friends & participate! 🌸
+💖 From the team with lots of love 💖
 
-🌸 From the team, we hope you have a wonderful time! 🌸
-💖 Enjoy, Participate, and Make Friends 💖
-
-⏰ Time: Good ${session} 🌞
+⏰ 𝗧𝗶𝗺𝗲: Good ${session} 🌞
 ╔═══════════════❁🌸❁═══════════════╗
-       🌟 Have fun & stay safe 🌟
+      ⭐💖 𝐇𝐀𝐕𝐄 𝐅𝐔𝐍 & 𝐒𝐓𝐀𝐘 𝐒𝐀𝐅𝐄 💖⭐
 ╚═══════════════❁🌸❁═══════════════╝
 `;
 
