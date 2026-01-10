@@ -5,6 +5,7 @@ const path = require("path");
 
 const CACHE_DIR = path.join(__dirname, "cache");
 
+// 🌈 RANDOM FUN WELCOME GIFs
 const WELCOME_GIFS = [
   "https://files.catbox.moe/38guc2.gif",
   "https://files.catbox.moe/7xq1k3.gif",
@@ -13,6 +14,7 @@ const WELCOME_GIFS = [
   "https://files.catbox.moe/1kz9e7.gif"
 ];
 
+// 🎬 RANDOM GIF DOWNLOAD
 async function getRandomGif() {
   const url = WELCOME_GIFS[Math.floor(Math.random() * WELCOME_GIFS.length)];
   const filePath = path.join(CACHE_DIR, path.basename(url));
@@ -24,6 +26,7 @@ async function getRandomGif() {
   return filePath;
 }
 
+// 🖼️ USER AVATAR
 async function getUserAvatar(userID) {
   const avatarPath = path.join(CACHE_DIR, `avatar_${userID}.jpg`);
   if (!fs.existsSync(avatarPath)) {
@@ -35,7 +38,7 @@ async function getUserAvatar(userID) {
 }
 
 module.exports = {
-  config: { name: "welcome", version: "16.1.0", author: "Ratul", category: "events" },
+  config: { name: "welcome", version: "17.0.0", author: "Ratul", category: "events" },
 
   onStart: async ({ api, event, threadsData }) => {
     if (event.logMessageType !== "log:subscribe") return;
@@ -44,12 +47,15 @@ module.exports = {
       const threadID = event.threadID;
       const added = event.logMessageData.addedParticipants || [];
       const botID = api.getCurrentUserID();
+
+      // Ignore bot
       const newMembers = added.filter(u => u.userFbId !== botID);
       if (!newMembers.length) return;
 
       const threadData = await threadsData.get(threadID);
       const groupName = threadData?.threadName || "এই গ্রুপ";
 
+      // 🕒 TIME SESSION
       const hour = new Date().getHours();
       const session =
         hour < 12 ? "🌅 সুপ্রভাত" :
@@ -57,21 +63,23 @@ module.exports = {
         hour < 20 ? "🌆 শুভ সন্ধ্যা" :
         "🌙 শুভ রাত্রি";
 
+      // 👥 THREAD INFO
       const threadInfo = await api.getThreadInfo(threadID);
       const memberCount = threadInfo.participantIDs.length;
 
-      // Load GIF background
+      // GIF background
       const gifPath = await getRandomGif();
       const bg = await loadImage(gifPath);
 
-      const canvas = createCanvas(1200, 600);
+      const canvas = createCanvas(1400, 700);
       const ctx = canvas.getContext("2d");
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // Draw member avatars
-      const avatarSize = 100;
-      const spacing = 20;
-      let startX = (canvas.width - (newMembers.length * (avatarSize + spacing) - spacing)) / 2;
+      // Draw avatars horizontally with spacing
+      const avatarSize = 120;
+      const spacing = 30;
+      let totalWidth = newMembers.length * (avatarSize + spacing) - spacing;
+      let startX = (canvas.width - totalWidth) / 2;
 
       const avatars = [];
       for (const member of newMembers) {
@@ -83,40 +91,47 @@ module.exports = {
       avatars.forEach((av, i) => {
         ctx.save();
         ctx.beginPath();
-        ctx.arc(startX + avatarSize / 2, 200, avatarSize / 2, 0, Math.PI * 2);
+        ctx.arc(startX + avatarSize / 2, 250, avatarSize / 2, 0, Math.PI * 2);
         ctx.closePath();
         ctx.clip();
-        ctx.drawImage(av.image, startX, 150, avatarSize, avatarSize);
+        ctx.drawImage(av.image, startX, 190, avatarSize, avatarSize);
         ctx.restore();
+
+        // Name below avatar
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 26px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(av.name, startX + avatarSize / 2, 330);
+
         startX += avatarSize + spacing;
       });
 
-      // Overlay text
-      ctx.fillStyle = "white";
+      // Overlay welcome text
+      ctx.fillStyle = "#ffd700";
       ctx.textAlign = "center";
 
       ctx.font = "bold 50px Arial";
       ctx.fillText("🌸 আসসালামু আলাইকুম 🌸", canvas.width / 2, 80);
 
-      ctx.font = "bold 36px Arial";
-      ctx.fillText(`🎉 নতুন সদস্য ${newMembers.length} জন যোগ দিলেন! 🎉`, canvas.width / 2, 320);
+      ctx.font = "bold 38px Arial";
+      ctx.fillText(`🎉 নতুন সদস্য ${newMembers.length} জন যোগ দিলেন! 🎉`, canvas.width / 2, 400);
 
-      ctx.font = "bold 30px Arial";
-      ctx.fillText(`গ্রুপ ➤ ${groupName.toUpperCase()}`, canvas.width / 2, 380);
+      ctx.font = "bold 34px Arial";
+      ctx.fillText(`গ্রুপ ➤ ${groupName.toUpperCase()}`, canvas.width / 2, 450);
+
+      ctx.font = "bold 32px Arial";
+      ctx.fillText(`মোট সদস্য : ${memberCount}`, canvas.width / 2, 500);
+
+      ctx.font = "bold 32px Arial";
+      ctx.fillText(`${session}`, canvas.width / 2, 550);
+
+      ctx.font = "bold 32px Arial";
+      ctx.fillText(`👑 মালিক : Mehedi Hasan`, canvas.width / 2, 600);
 
       ctx.font = "bold 28px Arial";
-      ctx.fillText(`মোট সদস্য : ${memberCount}`, canvas.width / 2, 420);
+      ctx.fillText("🎁 কেক 🍰, আলিঙ্গন 🤗 & ভার্চুয়াল কনফেটি 🎉", canvas.width / 2, 650);
 
-      ctx.font = "bold 28px Arial";
-      ctx.fillText(`${session}`, canvas.width / 2, 460);
-
-      ctx.font = "bold 28px Arial";
-      ctx.fillText(`👑 মালিক : Mehedi Hasan`, canvas.width / 2, 500);
-
-      ctx.font = "bold 24px Arial";
-      ctx.fillText("🎁 কেক 🍰, আলিঙ্গন 🤗 & ভার্চুয়াল কনফেটি 🎉", canvas.width / 2, 540);
-
-      // Save and send image
+      // Save & send image
       const outPath = path.join(CACHE_DIR, `welcome_group.png`);
       const out = fs.createWriteStream(outPath);
       const stream = canvas.createPNGStream();
