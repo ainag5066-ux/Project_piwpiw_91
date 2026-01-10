@@ -1,74 +1,81 @@
-// welcome.js
+const axios = require("axios");
+const fs = require("fs-extra");
+const path = require("path");
+
+const WELCOME_GIF_URL = "https://files.catbox.moe/38guc2.gif";
+const GIF_PATH = path.join(__dirname, "cache", "welcome.gif");
+
+async function getWelcomeGif() {
+  if (!fs.existsSync(GIF_PATH)) {
+    const { data } = await axios.get(WELCOME_GIF_URL, { responseType: "arraybuffer" });
+    await fs.ensureDir(path.dirname(GIF_PATH));
+    await fs.writeFile(GIF_PATH, data);
+  }
+  return fs.createReadStream(GIF_PATH);
+}
+
 module.exports = {
-    config: {
-        name: "welcome",
-        version: "11.0",
-        author: "Ratul",
-        category: "events"
-    },
+  config: {
+    name: "welcome",
+    version: "3.0.0",
+    author: "Ratul",
+    category: "events"
+  },
 
-    onStart: async ({ api, event, threadsData }) => {
-        try {
-            if (event.logMessageType !== "log:subscribe") return;
+  onStart: async ({ api, event, threadsData, usersData }) => {
+    if (event.logMessageType !== "log:subscribe") return;
 
-            const threadID = event.threadID;
-            const addedParticipants = event.logMessageData.addedParticipants || [];
-            const botID = api.getCurrentUserID();
+    try {
+      const threadID = event.threadID;
+      const added = event.logMessageData.addedParticipants || [];
+      const botID = api.getCurrentUserID();
 
-            // Ignore if bot joins
-            if (addedParticipants.some(u => u.userFbId === botID)) return;
+      // bot join ignore
+      if (added.some(u => u.userFbId == botID)) return;
 
-            // Thread info
-            const threadData = await threadsData.get(threadID);
-            const threadNameRaw = threadData.threadName || "This Group";
-            const threadName = `🌸✨ ${threadNameRaw.toUpperCase()} ✨🌸`;
+      const threadData = await threadsData.get(threadID);
+      const groupName = threadData?.threadName || "This Group";
 
-            // Members info
-            const membersList = threadData.data?.members || [];
+      let names = "";
+      let mentions = [];
 
-            // Mentions & names
-            const mentions = addedParticipants.map(u => ({ tag: u.fullName, id: u.userFbId }));
-            const userNames = addedParticipants.map(u => u.fullName).join(", ");
+      for (const u of added) {
+        names += `@${u.fullName} `;
+        mentions.push({ tag: u.fullName, id: u.userFbId });
+      }
 
-            // Member numbers
-            const memberNumbers = addedParticipants.map(u => {
-                const index = membersList.findIndex(m => m.id === u.userFbId);
-                return index >= 0 ? index + 1 : membersList.length + 1;
-            });
-            const memberNumbersText = memberNumbers.map(num => `#${num}`).join(", ");
+      const hour = new Date().getHours();
+      const session =
+        hour < 12 ? "Good Morning ☀️" :
+        hour < 17 ? "Good Afternoon 🌤️" :
+        hour < 20 ? "Good Evening 🌆" :
+        "Good Night 🌙";
 
-            // Time session
-            const now = new Date();
-            const hours = now.getHours();
-            let session;
-            if (hours >= 5 && hours <= 10) session = "Morning";
-            else if (hours <= 12) session = "Noon";
-            else if (hours <= 18) session = "Afternoon";
-            else session = "Evening";
+      const memberCount = (await api.getThreadInfo(threadID)).participantIDs.length;
 
-            // Stylish Welcome Message with Assalamualaikum
-            const welcomeMessage = `
-╔═══════════════❁🌸❁═══════════════╗
-         🌟 𝐀𝐬𝐬𝐚𝐥𝐚𝐦𝐮𝐚𝐥𝐚𝐢𝐤𝐮𝐦 🌟
-╚═══════════════❁🌸❁═══════════════╝
+      const body =
+`🌸✨ ASSALAMUALAIKUM ✨🌸
 
-🎉 𝗡𝗘𝗪 𝗠𝗘𝗠𝗕𝗘𝗥: ${userNames}
-🎀 𝗚𝗥𝗢𝗨𝗣 𝗡𝗔𝗠𝗘: ${threadName}
-💫 𝗠𝗘𝗠𝗕𝗘𝗥 𝗡𝗨𝗠𝗕𝗘𝗥: ${memberNumbersText}
+👤 New Member: ${names}
+🏠 Group: ${groupName}
+🔢 Member No: ${memberCount}
 
-🌸 Enjoy your time, make friends & participate! 🌸
-💖 From the team with lots of love 💖
+💖 Feel free to chat & enjoy
+⏰ ${session}`;
 
-⏰ 𝗧𝗶𝗺𝗲: Good ${session} 🌞
-╔═══════════════❁🌸❁═══════════════╗
-      ⭐💖 𝐇𝐀𝐕𝐄 𝐅𝐔𝐍 & 𝐒𝐓𝐀𝐘 𝐒𝐀𝐅𝐄 💖⭐
-╚═══════════════❁🌸❁═══════════════╝
-`;
+      const gifStream = await getWelcomeGif();
 
-            await api.sendMessage({ body: welcomeMessage, mentions }, threadID);
+      await api.sendMessage(
+        {
+          body,
+          mentions,
+          attachment: gifStream
+        },
+        threadID
+      );
 
-        } catch (err) {
-            console.error("Welcome module error:", err);
-        }
+    } catch (err) {
+      console.error("❌ Welcome GIF error:", err);
     }
+  }
 };
