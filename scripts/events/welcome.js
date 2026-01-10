@@ -4,7 +4,6 @@ const path = require("path");
 
 const CACHE_DIR = path.join(__dirname, "cache");
 
-// 🌈 RANDOM WELCOME GIFs
 const WELCOME_GIFS = [
   "https://files.catbox.moe/38guc2.gif",
   "https://files.catbox.moe/7xq1k3.gif",
@@ -14,24 +13,21 @@ const WELCOME_GIFS = [
 ];
 
 async function getRandomGif() {
-  const gifURL = WELCOME_GIFS[Math.floor(Math.random() * WELCOME_GIFS.length)];
-  const gifPath = path.join(CACHE_DIR, path.basename(gifURL));
+  const url = WELCOME_GIFS[Math.floor(Math.random() * WELCOME_GIFS.length)];
+  const filePath = path.join(CACHE_DIR, path.basename(url));
 
-  if (!fs.existsSync(gifPath)) {
+  if (!fs.existsSync(filePath)) {
     await fs.ensureDir(CACHE_DIR);
-    const res = await axios.get(gifURL, {
-      responseType: "arraybuffer",
-      headers: { "User-Agent": "Mozilla/5.0" }
-    });
-    await fs.writeFile(gifPath, res.data);
+    const res = await axios.get(url, { responseType: "arraybuffer" });
+    await fs.writeFile(filePath, res.data);
   }
-  return fs.createReadStream(gifPath);
+  return fs.createReadStream(filePath);
 }
 
 module.exports = {
   config: {
     name: "welcome",
-    version: "8.0.0",
+    version: "8.1.0",
     author: "Ratul",
     category: "events"
   },
@@ -46,71 +42,61 @@ module.exports = {
       if (added.some(u => u.userFbId == botID)) return;
 
       const threadData = await threadsData.get(threadID);
-      const rawGroupName = threadData?.threadName || "This Group";
-
-      // ✨ GROUP NAME STYLE
-      const groupName =
-`╭─── ❖ 🌸 𝗚𝗥𝗢𝗨𝗣 𝗡𝗔𝗠𝗘 🌸 ❖ ───╮
-      『 ${rawGroupName} 』
-╰─── ❖ ❖ ❖ ❖ ❖ ❖ ❖ ───╯`;
+      const groupName = threadData?.threadName || "This Group";
 
       let mentions = [];
-      let memberText = "";
+      let memberLines = "";
 
       for (const u of added) {
-        memberText += `🌟 𝑾𝒆𝒍𝒄𝒐𝒎𝒆 ➤ @${u.fullName} 🌟\n`;
+        memberLines += `➤ @${u.fullName}\n`; // ❗ clean mention
         mentions.push({ tag: u.fullName, id: u.userFbId });
       }
 
       const hour = new Date().getHours();
       const session =
-        hour < 12 ? "🌅 𝙂𝙊𝙊𝘿 𝙈𝙊𝙍𝙉𝙄𝙉𝙂" :
-        hour < 17 ? "🌤️ 𝙂𝙊𝙊𝘿 𝘼𝙁𝙏𝙀𝙍𝙉𝙊𝙊𝙉" :
-        hour < 20 ? "🌆 𝙂𝙊𝙊𝘿 𝙀𝙑𝙀𝙉𝙄𝙉𝙂" :
-        "🌙 𝙂𝙊𝙊𝘿 𝙉𝙄𝙂𝙃𝙏";
+        hour < 12 ? "🌅 GOOD MORNING" :
+        hour < 17 ? "🌤️ GOOD AFTERNOON" :
+        hour < 20 ? "🌆 GOOD EVENING" :
+        "🌙 GOOD NIGHT";
 
       const threadInfo = await api.getThreadInfo(threadID);
       const memberCount = threadInfo.participantIDs.length;
 
       const body =
-`╔══════════════════════════════╗
-   🌸✨ 𝗔𝗦𝗦𝗔𝗟𝗔𝗠𝗨𝗔𝗟𝗔𝗜𝗞𝗨𝗠 ✨🌸
-╚══════════════════════════════╝
+`╔══════════════════════╗
+   🌸 ASSALAMUALAIKUM 🌸
+╚══════════════════════╝
 
-👑✨ 𝗡𝗘𝗪 𝗠𝗘𝗠𝗕𝗘𝗥 𝗔𝗟𝗘𝗥𝗧 ✨👑
-━━━━━━━━━━━━━━━━━━━━━━━
-${memberText.trim()}
-━━━━━━━━━━━━━━━━━━━━━━━
+👑 NEW MEMBER JOINED
+━━━━━━━━━━━━━━
+${memberLines.trim()}
+━━━━━━━━━━━━━━
 
-${groupName}
+🏠 GROUP : 『 ${groupName} 』
+👥 TOTAL MEMBERS : ${memberCount}
 
-👥 𝗧𝗢𝗧𝗔𝗟 𝗠𝗘𝗠𝗕𝗘𝗥𝗦 ➤ ${memberCount}
-
-💖 Be Friendly  
-💬 Stay Active  
-🤝 Respect Everyone  
+💖 Be Friendly
+🤝 Respect Everyone
 
 ⏰ ${session}
 
-╔══════════════════════════════╗
- 👑 𝗢𝗪𝗡𝗘𝗥 : ✦ 𝗠𝗲𝗵𝗲𝗱𝗶 𝗛𝗮𝘀𝗮𝗻 ✦ 👑
-╚══════════════════════════════╝
+👑 OWNER : Mehedi Hasan
 
-🔥✨ 𝗘𝗡𝗝𝗢𝗬 𝗬𝗢𝗨𝗥 𝗦𝗧𝗔𝗬 ✨🔥`;
+🔥 ENJOY YOUR STAY 🔥`;
 
-      const gifStream = await getRandomGif();
+      const gif = await getRandomGif();
 
       await api.sendMessage(
         {
           body,
           mentions,
-          attachment: gifStream
+          attachment: [gif] // ✅ MUST BE ARRAY
         },
         threadID
       );
 
-    } catch (err) {
-      console.error("❌ Welcome error:", err);
+    } catch (e) {
+      console.error("WELCOME ERROR:", e);
     }
   }
 };
