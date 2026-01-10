@@ -25,7 +25,7 @@ async function getRandomGif() {
 }
 
 module.exports = {
-  config: { name: "welcome", version: "12.0.0", author: "Ratul", category: "events" },
+  config: { name: "welcome", version: "12.1.0", author: "Ratul", category: "events" },
 
   onStart: async ({ api, event, threadsData }) => {
     if (event.logMessageType !== "log:subscribe") return;
@@ -34,15 +34,18 @@ module.exports = {
       const threadID = event.threadID;
       const added = event.logMessageData.addedParticipants || [];
       const botID = api.getCurrentUserID();
-      if (added.some(u => u.userFbId == botID)) return;
+
+      // Bot add ignore
+      const newMembers = added.filter(u => u.userFbId != botID);
+      if (!newMembers.length) return;
 
       const threadData = await threadsData.get(threadID);
       const groupName = threadData?.threadName || "This Group";
 
-      // ✨ MEMBER MENTIONS
+      // ✨ MEMBER MENTIONS & TEXT
       let mentions = [];
       let memberText = "";
-      for (const member of added) {
+      for (const member of newMembers) {
         mentions.push({ tag: member.fullName, id: member.userFbId });
         memberText += `🎉 @${member.fullName} 🎉\n`;
       }
@@ -65,7 +68,7 @@ module.exports = {
       🌸 ASSALAMUALAIKUM 🌸
 ╚════════════════════════════╝
 
-👑 NEW MEMBER${added.length > 1 ? "S" : ""} JOINED 🎊
+👑 NEW MEMBER${newMembers.length > 1 ? "S" : ""} JOINED 🎊
 ━━━━━━━━━━━━━━━━━━━━━━
 ${memberText.trim()}
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -87,6 +90,7 @@ ${memberText.trim()}
       // ✨ RANDOM GIF
       const gifPath = await getRandomGif();
 
+      // ✅ Send message
       await api.sendMessage(
         { body, mentions, attachment: [fs.createReadStream(gifPath)] },
         threadID
