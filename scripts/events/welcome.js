@@ -25,7 +25,7 @@ async function getRandomGif() {
 }
 
 module.exports = {
-  config: { name: "welcome", version: "12.1.0", author: "Ratul", category: "events" },
+  config: { name: "welcome", version: "13.0.0", author: "Ratul", category: "events" },
 
   onStart: async ({ api, event, threadsData }) => {
     if (event.logMessageType !== "log:subscribe") return;
@@ -35,62 +35,60 @@ module.exports = {
       const added = event.logMessageData.addedParticipants || [];
       const botID = api.getCurrentUserID();
 
-      // Bot add ignore
-      const newMembers = added.filter(u => u.userFbId != botID);
+      // Bot ke ignore koro
+      const newMembers = added.filter(u => u.userFbId !== botID);
       if (!newMembers.length) return;
 
       const threadData = await threadsData.get(threadID);
-      const groupName = threadData?.threadName || "This Group";
+      const groupName = threadData?.threadName || "এই গ্রুপ";
 
-      // ✨ MEMBER MENTIONS & TEXT
+      // 🌟 MEMBER MENTIONS & TEXT
       let mentions = [];
       let memberText = "";
-      for (const member of newMembers) {
-        mentions.push({ tag: member.fullName, id: member.userFbId });
-        memberText += `🎉 @${member.fullName} 🎉\n`;
-      }
+      newMembers.forEach((m, i) => {
+        mentions.push({ tag: m.fullName, id: m.userFbId });
+        memberText += `🎉 ${i + 1}. @${m.fullName} 🎉\n`;
+      });
 
-      // ✨ TIME SESSION
+      // 🌤️ TIME SESSION
       const hour = new Date().getHours();
       const session =
-        hour < 12 ? "🌅 GOOD MORNING" :
-        hour < 17 ? "🌤️ GOOD AFTERNOON" :
-        hour < 20 ? "🌆 GOOD EVENING" :
-        "🌙 GOOD NIGHT";
+        hour < 12 ? "🌅 সুপ্রভাত" :
+        hour < 17 ? "🌤️ শুভ দুপুর" :
+        hour < 20 ? "🌆 শুভ সন্ধ্যা" :
+        "🌙 শুভ রাত্রি";
 
-      // ✨ THREAD INFO
+      // 🏠 THREAD INFO
       const threadInfo = await api.getThreadInfo(threadID);
       const memberCount = threadInfo.participantIDs.length;
 
-      // ✨ FUN & STYLISH MESSAGE
+      // 🎊 FUN & STYLISH WELCOME
       const body =
 `╔════════════════════════════╗
-      🌸 ASSALAMUALAIKUM 🌸
+      🌸 আসসালামু আলাইকুম 🌸
 ╚════════════════════════════╝
 
-👑 NEW MEMBER${newMembers.length > 1 ? "S" : ""} JOINED 🎊
+👑 নতুন সদস্য${newMembers.length > 1 ? "রা" : ""} যোগ দিলেন 🎊
 ━━━━━━━━━━━━━━━━━━━━━━
 ${memberText.trim()}
 ━━━━━━━━━━━━━━━━━━━━━━
 
-🏠 GROUP : 『 ✨ ${groupName.toUpperCase()} ✨ 』
-👥 TOTAL MEMBERS : ${memberCount}
+🏠 গ্রুপ : 『 ✨ ${groupName.toUpperCase()} ✨ 』
+👥 মোট সদস্য : ${memberCount}
 
-💖 Be Friendly & Share Memes 😂  
-🤝 Respect Everyone & Don't Spam 😎
+💖 বন্ধুত্বপূর্ণ হও এবং মজার মেম শেয়ার করো 😂  
+🤝 সবাইকে সম্মান করো & স্প্যাম কোরো না 😎
 
 ⏰ ${session}
 
-👑 OWNER : ✦ Mehedi Hasan ✦
-🎁 PS: Enjoy cake 🍰, hugs 🤗 & virtual confetti 🎉
+👑 মালিক : ✦ Mehedi Hasan ✦
+🎁 পি.এস : কেক 🍰 খাও, আলিঙ্গন 🤗 করো & ভার্চুয়াল কনফেটি 🎉
 
-🔥 ENJOY YOUR STAY 🔥
-🌈 Welcome to the FUN ZONE! 🌈`;
+🔥 মজা করো এবং ভালো সময় কাটাও 🔥
+🌈 FUN ZONE এ স্বাগতম! 🌈`;
 
-      // ✨ RANDOM GIF
       const gifPath = await getRandomGif();
 
-      // ✅ Send message
       await api.sendMessage(
         { body, mentions, attachment: [fs.createReadStream(gifPath)] },
         threadID
