@@ -1,3 +1,4 @@
+const { createCanvas, loadImage } = require("canvas");
 const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
@@ -13,6 +14,7 @@ const WELCOME_GIFS = [
   "https://files.catbox.moe/1kz9e7.gif"
 ];
 
+// ✨ RANDOM GIF
 async function getRandomGif() {
   const url = WELCOME_GIFS[Math.floor(Math.random() * WELCOME_GIFS.length)];
   const filePath = path.join(CACHE_DIR, path.basename(url));
@@ -24,8 +26,19 @@ async function getRandomGif() {
   return filePath;
 }
 
+// ✨ USER AVATAR
+async function getUserAvatar(userID) {
+  const avatarPath = path.join(CACHE_DIR, `avatar_${userID}.jpg`);
+  if (!fs.existsSync(avatarPath)) {
+    const url = `https://graph.facebook.com/${userID}/picture?height=720&width=720`;
+    const { data } = await axios.get(url, { responseType: "arraybuffer" });
+    await fs.writeFile(avatarPath, data);
+  }
+  return avatarPath;
+}
+
 module.exports = {
-  config: { name: "welcome", version: "13.0.0", author: "Ratul", category: "events" },
+  config: { name: "welcome", version: "15.0.0", author: "Ratul", category: "events" },
 
   onStart: async ({ api, event, threadsData }) => {
     if (event.logMessageType !== "log:subscribe") return;
@@ -34,23 +47,13 @@ module.exports = {
       const threadID = event.threadID;
       const added = event.logMessageData.addedParticipants || [];
       const botID = api.getCurrentUserID();
-
-      // Bot ke ignore koro
       const newMembers = added.filter(u => u.userFbId !== botID);
       if (!newMembers.length) return;
 
       const threadData = await threadsData.get(threadID);
       const groupName = threadData?.threadName || "এই গ্রুপ";
 
-      // 🌟 MEMBER MENTIONS & TEXT
-      let mentions = [];
-      let memberText = "";
-      newMembers.forEach((m, i) => {
-        mentions.push({ tag: m.fullName, id: m.userFbId });
-        memberText += `🎉 ${i + 1}. @${m.fullName} 🎉\n`;
-      });
-
-      // 🌤️ TIME SESSION
+      // ✨ TIME SESSION
       const hour = new Date().getHours();
       const session =
         hour < 12 ? "🌅 সুপ্রভাত" :
@@ -58,41 +61,69 @@ module.exports = {
         hour < 20 ? "🌆 শুভ সন্ধ্যা" :
         "🌙 শুভ রাত্রি";
 
-      // 🏠 THREAD INFO
+      // ✨ THREAD INFO
       const threadInfo = await api.getThreadInfo(threadID);
       const memberCount = threadInfo.participantIDs.length;
 
-      // 🎊 FUN & STYLISH WELCOME
-      const body =
-`╔════════════════════════════╗
-      🌸 আসসালামু আলাইকুম 🌸
-╚════════════════════════════╝
+      // Loop for each new member
+      for (const member of newMembers) {
+        const avatarPath = await getUserAvatar(member.userFbId);
+        const gifPath = await getRandomGif();
 
-👑 নতুন সদস্য${newMembers.length > 1 ? "রা" : ""} যোগ দিলেন 🎊
-━━━━━━━━━━━━━━━━━━━━━━
-${memberText.trim()}
-━━━━━━━━━━━━━━━━━━━━━━
+        // Canvas setup
+        const canvas = createCanvas(1000, 500);
+        const ctx = canvas.getContext("2d");
 
-🏠 গ্রুপ : 『 ✨ ${groupName.toUpperCase()} ✨ 』
-👥 মোট সদস্য : ${memberCount}
+        // Load GIF as background (first frame)
+        const bg = await loadImage(gifPath);
+        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-💖 বন্ধুত্বপূর্ণ হও এবং মজার মেম শেয়ার করো 😂  
-🤝 সবাইকে সম্মান করো & স্প্যাম কোরো না 😎
+        // Profile pic
+        const avatar = await loadImage(avatarPath);
+        const avatarSize = 150;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 180, avatarSize / 2, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(avatar, canvas.width / 2 - avatarSize / 2, 105, avatarSize, avatarSize);
+        ctx.restore();
 
-⏰ ${session}
+        // Overlay text
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
 
-👑 মালিক : ✦ Mehedi Hasan ✦
-🎁 পি.এস : কেক 🍰 খাও, আলিঙ্গন 🤗 করো & ভার্চুয়াল কনফেটি 🎉
+        ctx.font = "bold 40px Arial";
+        ctx.fillText("🌸 আসসালামু আলাইকুম 🌸", canvas.width / 2, 50);
 
-🔥 মজা করো এবং ভালো সময় কাটাও 🔥
-🌈 FUN ZONE এ স্বাগতম! 🌈`;
+        ctx.font = "bold 34px Arial";
+        ctx.fillText(`🎉 ${member.fullName} 🎉`, canvas.width / 2, 370);
 
-      const gifPath = await getRandomGif();
+        ctx.font = "bold 28px Arial";
+        ctx.fillText(`গ্রুপ ➤ ${groupName.toUpperCase()}`, canvas.width / 2, 410);
 
-      await api.sendMessage(
-        { body, mentions, attachment: [fs.createReadStream(gifPath)] },
-        threadID
-      );
+        ctx.font = "bold 24px Arial";
+        ctx.fillText(`মোট সদস্য : ${memberCount}`, canvas.width / 2, 450);
+
+        ctx.font = "bold 24px Arial";
+        ctx.fillText(`${session}`, canvas.width / 2, 480);
+
+        // Save image
+        const outPath = path.join(CACHE_DIR, `welcome_${member.userFbId}.png`);
+        const out = fs.createWriteStream(outPath);
+        const stream = canvas.createPNGStream();
+        stream.pipe(out);
+        await new Promise(resolve => out.on("finish", resolve));
+
+        // Send message
+        const msg = `🎊 নতুন সদস্য ${member.fullName} কে স্বাগতম! 🎊\n\n👑 মালিক : Mehedi Hasan\n🔥 মজা করো & ভালো সময় কাটাও`;
+        await api.sendMessage(
+          { body: msg, attachment: fs.createReadStream(outPath) },
+          threadID
+        );
+
+        fs.unlinkSync(outPath);
+      }
 
     } catch (err) {
       console.error("❌ Welcome ERROR:", err);
