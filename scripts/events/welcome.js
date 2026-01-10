@@ -4,7 +4,7 @@ const path = require("path");
 
 const CACHE_DIR = path.join(__dirname, "cache");
 
-// RANDOM WELCOME GIFs
+// 🌈 RANDOM FUN WELCOME GIFs
 const WELCOME_GIFS = [
   "https://files.catbox.moe/38guc2.gif",
   "https://files.catbox.moe/7xq1k3.gif",
@@ -25,7 +25,7 @@ async function getRandomGif() {
 }
 
 module.exports = {
-  config: { name: "welcome", version: "10.0.0", author: "Ratul", category: "events" },
+  config: { name: "welcome", version: "12.0.0", author: "Ratul", category: "events" },
 
   onStart: async ({ api, event, threadsData }) => {
     if (event.logMessageType !== "log:subscribe") return;
@@ -39,13 +39,15 @@ module.exports = {
       const threadData = await threadsData.get(threadID);
       const groupName = threadData?.threadName || "This Group";
 
+      // ✨ MEMBER MENTIONS
       let mentions = [];
       let memberText = "";
-      for (const u of added) {
-        memberText += `🌟 @${u.fullName} 🌟\n`;
-        mentions.push({ tag: u.fullName, id: u.userFbId });
+      for (const member of added) {
+        mentions.push({ tag: member.fullName, id: member.userFbId });
+        memberText += `🎉 @${member.fullName} 🎉\n`;
       }
 
+      // ✨ TIME SESSION
       const hour = new Date().getHours();
       const session =
         hour < 12 ? "🌅 GOOD MORNING" :
@@ -53,35 +55,40 @@ module.exports = {
         hour < 20 ? "🌆 GOOD EVENING" :
         "🌙 GOOD NIGHT";
 
+      // ✨ THREAD INFO
       const threadInfo = await api.getThreadInfo(threadID);
       const memberCount = threadInfo.participantIDs.length;
 
+      // ✨ FUN & STYLISH MESSAGE
       const body =
-`╔══════════════════════════╗
+`╔════════════════════════════╗
       🌸 ASSALAMUALAIKUM 🌸
-╚══════════════════════════╝
+╚════════════════════════════╝
 
-👑 NEW MEMBER JOINED
-━━━━━━━━━━━━━━
+👑 NEW MEMBER${added.length > 1 ? "S" : ""} JOINED 🎊
+━━━━━━━━━━━━━━━━━━━━━━
 ${memberText.trim()}
-━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━
 
-🏠 GROUP : 『 ${groupName.toUpperCase()} 』
+🏠 GROUP : 『 ✨ ${groupName.toUpperCase()} ✨ 』
 👥 TOTAL MEMBERS : ${memberCount}
 
-💖 Be Friendly  
-🤝 Respect Everyone  
+💖 Be Friendly & Share Memes 😂  
+🤝 Respect Everyone & Don't Spam 😎
 
 ⏰ ${session}
 
-👑 OWNER : Mehedi Hasan
+👑 OWNER : ✦ Mehedi Hasan ✦
+🎁 PS: Enjoy cake 🍰, hugs 🤗 & virtual confetti 🎉
 
-🔥 ENJOY YOUR STAY 🔥`;
+🔥 ENJOY YOUR STAY 🔥
+🌈 Welcome to the FUN ZONE! 🌈`;
 
-      const gif = await getRandomGif();
+      // ✨ RANDOM GIF
+      const gifPath = await getRandomGif();
 
       await api.sendMessage(
-        { body, mentions, attachment: [fs.createReadStream(gif)] },
+        { body, mentions, attachment: [fs.createReadStream(gifPath)] },
         threadID
       );
 
