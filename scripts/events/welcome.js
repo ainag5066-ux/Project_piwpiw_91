@@ -5,7 +5,7 @@ if (!global.temp.welcomeEvent)
 module.exports = {
 	config: {
 		name: "welcome",
-		version: "2.2",
+		version: "2.3",
 		author: "NTKhang & Mehedi Hasan",
 		category: "events"
 	},
@@ -23,8 +23,9 @@ module.exports = {
 
 🎀 𝐖𝐞𝐥𝐜𝐨𝐦𝐞 {multiple} {userName} 𝐭𝐨 𝐨𝐮𝐫 𝐆𝐫𝐨𝐮𝐩 🌟
 
-📌 𝐆𝐫𝐨𝐮𝐩: [ {boxName} ]
+📌 𝐆𝐫𝐨𝐮𝐩: ✨「 {boxName} 」✨
 💎 𝐎𝐰𝐧𝐞𝐫: Mehedi Hasan
+👥 𝐓𝐨𝐭𝐚𝐥 𝐌𝐞𝐦𝐛𝐞𝐫𝐬: {memberCount}
 
 🌈 𝐖𝐢𝐬𝐡𝐢𝐧𝐠 𝐲𝐨𝐮 𝐚 𝐛𝐞𝐚𝐮𝐭𝐢𝐟𝐮𝐥 {session} 🕊
 ⚠ 𝐏𝐥𝐞𝐚𝐬𝐞 𝐟𝐨𝐥𝐥𝐨𝐰 𝐚𝐥𝐥 𝐫𝐮𝐥𝐞𝐬 ♻
@@ -44,8 +45,9 @@ module.exports = {
 
 🎀 𝐖𝐞𝐥𝐜𝐨𝐦𝐞 {multiple} {userName} 𝐭𝐨 𝐨𝐮𝐫 𝐆𝐫𝐨𝐮𝐩 🌟
 
-📌 𝐆𝐫𝐨𝐮𝐩: [ {boxName} ]
+📌 𝐆𝐫𝐨𝐮𝐩: ✨「 {boxName} 」✨
 💎 𝐎𝐰𝐧𝐞𝐫: Mehedi Hasan
+👥 𝐓𝐨𝐭𝐚𝐥 𝐌𝐞𝐦𝐛𝐞𝐫𝐬: {memberCount}
 
 🌈 𝐖𝐢𝐬𝐡𝐢𝐧𝐠 𝐲𝐨𝐮 𝐚 𝐛𝐞𝐚𝐮𝐭𝐢𝐟𝐮𝐥 {session} 🕊
 ⚠ 𝐏𝐥𝐞𝐚𝐬𝐞 𝐟𝐨𝐥𝐥𝐨𝐰 𝐚𝐥𝐥 𝐫𝐮𝐥𝐞𝐬 ♻
@@ -103,6 +105,10 @@ module.exports = {
 
 					if (userName.length == 0) return;
 
+					// get total member count
+					const threadInfo = await api.getThreadInfo(threadID);
+					const memberCount = threadInfo.participantIDs.length;
+
 					let { welcomeMessage = getLang("defaultWelcomeMessage") } = threadData.data;
 
 					const form = {
@@ -122,7 +128,8 @@ module.exports = {
 									: hours <= 18
 										? getLang("session3")
 										: getLang("session4")
-						);
+						)
+						.replace(/\{memberCount\}/g, memberCount);
 
 					form.body = welcomeMessage;
 
